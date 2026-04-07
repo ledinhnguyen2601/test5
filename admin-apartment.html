@@ -2,8 +2,7 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BQL Chung Cư - Hệ thống Quản trị</title>
+    <title>BQL Chung Cư - Quản trị</title>
     <link rel="stylesheet" href="css/style.css" />
     <link
       rel="stylesheet"
@@ -53,16 +52,14 @@
       </aside>
       <main class="main-content">
         <header class="topbar">
-          <h2 id="building-display" style="font-size: 1.1rem">
-            Hệ thống Tòa nhà
-          </h2>
+          <h2 id="building-display" style="font-size: 1.1rem">Đang tải...</h2>
           <div style="display: flex; align-items: center; gap: 15px">
-            <span id="admin-name" style="font-weight: 600; font-size: 1rem"
+            <span id="admin-name" style="font-weight: 600; font-size: 0.9rem"
               >BQL Admin</span
             >
             <button
               class="btn btn-outline logout-btn"
-              style="padding: 5px 10px; font-size: 0.9rem; width: auto"
+              style="padding: 5px 10px; font-size: 0.85rem; width: auto"
             >
               Đăng xuất
             </button>
@@ -139,7 +136,11 @@
           <div id="tab-cudan" class="content-section" style="display: none">
             <div
               class="card"
-              style="background: var(--bg-light); border: 1px dashed #0f766e"
+              style="
+                margin-bottom: 20px;
+                background: var(--bg-light);
+                border: 1px dashed #0f766e;
+              "
             >
               <h3 style="margin-bottom: 15px; color: #0f766e">
                 <i class="fas fa-user-plus"></i> Thêm Cư Dân Mới
@@ -202,7 +203,9 @@
                   </thead>
                   <tbody id="residents-tbody">
                     <tr>
-                      <td colspan="4">Đang tải...</td>
+                      <td colspan="4" style="text-align: center">
+                        Đang tải...
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -214,6 +217,7 @@
             <div
               class="card"
               style="
+                margin-bottom: 20px;
                 background: var(--bg-light);
                 border: 1px dashed var(--primary-color);
               "
@@ -259,7 +263,9 @@
                   </thead>
                   <tbody id="vehicles-tbody">
                     <tr>
-                      <td colspan="4">Đang tải...</td>
+                      <td colspan="4" style="text-align: center">
+                        Đang tải...
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -270,7 +276,11 @@
           <div id="tab-hoadon" class="content-section" style="display: none">
             <div
               class="card"
-              style="background: var(--bg-light); border: 1px dashed #d97706"
+              style="
+                margin-bottom: 20px;
+                background: var(--bg-light);
+                border: 1px dashed #d97706;
+              "
             >
               <div
                 style="
@@ -346,7 +356,9 @@
                   </thead>
                   <tbody id="bills-tbody">
                     <tr>
-                      <td colspan="5">Đang tải...</td>
+                      <td colspan="5" style="text-align: center">
+                        Đang tải...
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -369,7 +381,9 @@
                   </thead>
                   <tbody id="reports-tbody">
                     <tr>
-                      <td colspan="5">Đang kéo dữ liệu...</td>
+                      <td colspan="5" style="text-align: center">
+                        Đang tải...
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -382,21 +396,11 @@
               <h3 style="margin-bottom: 15px; color: #0f766e">
                 Cập nhật Thông tin Chung cư lên Trang Chủ
               </h3>
-              <p
-                style="
-                  color: var(--text-muted);
-                  margin-bottom: 20px;
-                  font-size: 0.9rem;
-                "
-              >
-                Điền thông tin vào đây để khách hàng tìm thấy dự án của bạn trên
-                màn hình chính.
-              </p>
               <div
                 style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px"
               >
                 <div>
-                  <label>Tên Chung Cư / Tòa nhà:</label
+                  <label>Tên Chung Cư:</label
                   ><input
                     type="text"
                     id="prof-name"
@@ -416,16 +420,15 @@
               ><input
                 type="text"
                 id="prof-address"
-                placeholder="VD: Số 10, Ngõ 20, Quận X..."
+                placeholder="VD: Số 10, Ngõ 20..."
               />
-              <label>Mô tả tiện ích (Hồ bơi, gym...):</label
+              <label>Mô tả tiện ích:</label
               ><textarea
                 id="prof-desc"
                 rows="3"
                 placeholder="Ghi rõ thông tin..."
               ></textarea>
-              <label style="margin-top: 10px"
-                >Ảnh bìa Tòa nhà (Hiển thị ngoài trang chủ):</label
+              <label style="margin-top: 10px">Ảnh bìa Tòa nhà:</label
               ><input
                 type="file"
                 id="prof-img"
@@ -444,6 +447,25 @@
         </div>
       </main>
     </div>
+
+    <script>
+      function switchTab(tabId, element) {
+        document
+          .querySelectorAll(".content-section")
+          .forEach((sec) => (sec.style.display = "none"));
+        document
+          .querySelectorAll(".nav-menu li")
+          .forEach((li) => li.classList.remove("active"));
+        document.getElementById(tabId).style.display = "block";
+        element.parentElement.classList.add("active");
+      }
+      function exportTableToExcel(tableID, filename = "") {
+        var tableSelect = document.getElementById(tableID);
+        var wb = XLSX.utils.table_to_book(tableSelect, { sheet: "Sheet 1" });
+        XLSX.writeFile(wb, filename + ".xlsx");
+      }
+    </script>
+
     <script type="module" src="js/admin-apartment.js"></script>
   </body>
 </html>

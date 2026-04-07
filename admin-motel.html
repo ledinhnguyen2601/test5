@@ -1,8 +1,8 @@
-!DOCTYPE html>
+<!doctype html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <title>Chủ Trọ - Quản lý Bất Động Sản</title>
+    <title>Chủ Trọ</title>
     <link rel="stylesheet" href="css/style.css" />
     <link
       rel="stylesheet"
@@ -50,7 +50,7 @@
           <h2 style="font-size: 1.1rem">Hệ thống Quản trị Trung tâm</h2>
           <div style="display: flex; align-items: center; gap: 15px">
             <span id="admin-name" style="font-weight: 600; font-size: 0.9rem"
-              >Chủ trọ Admin</span
+              >Đang tải...</span
             >
             <button
               class="btn btn-outline logout-btn"
@@ -96,7 +96,6 @@
                 </h3>
               </div>
             </div>
-
             <div
               style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px"
             >
@@ -121,7 +120,7 @@
                     color: var(--text-muted);
                   "
                 >
-                  BIỂU ĐỒ DOANH THU CÁC THÁNG (DEMO)
+                  BIỂU ĐỒ DOANH THU (VNĐ)
                 </h3>
                 <canvas id="revenueChart" style="max-height: 250px"></canvas>
               </div>
@@ -136,8 +135,6 @@
                   justify-content: space-between;
                   align-items: center;
                   margin-bottom: 15px;
-                  border-bottom: 1px solid var(--border-color);
-                  padding-bottom: 10px;
                 "
               >
                 <h3>Duyệt Số Điện Nước</h3>
@@ -165,7 +162,7 @@
                   <tbody id="utilities-tbody">
                     <tr>
                       <td colspan="7" style="text-align: center">
-                        Đang kéo dữ liệu...
+                        Đang tải...
                       </td>
                     </tr>
                   </tbody>
@@ -197,16 +194,14 @@
                   type="text"
                   id="new-room-id"
                   placeholder="Mã phòng (VD: P.105)"
-                />
-                <input
+                /><input
                   type="number"
                   id="new-room-price"
-                  placeholder="Giá thuê"
-                />
-                <input
+                  placeholder="Giá thuê (VNĐ)"
+                /><input
                   type="text"
                   id="new-room-tenant"
-                  placeholder="Tên khách"
+                  placeholder="Tên khách (Trống nếu chưa có)"
                 />
               </div>
               <button
@@ -257,7 +252,7 @@
                   <tbody id="reports-tbody">
                     <tr>
                       <td colspan="5" style="text-align: center">
-                        Đang kéo dữ liệu...
+                        Đang tải...
                       </td>
                     </tr>
                   </tbody>
@@ -274,62 +269,45 @@
               <h3 style="margin-bottom: 15px; color: var(--primary-color)">
                 Cập nhật Thông tin & Hình ảnh lên Trang Chủ
               </h3>
-              <p
-                style="
-                  color: var(--text-muted);
-                  margin-bottom: 20px;
-                  font-size: 0.9rem;
-                "
-              >
-                Điền thông tin vào đây để khách hàng tìm thấy khu trọ của bạn
-                trên màn hình chính.
-              </p>
-
               <div
                 style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px"
               >
                 <div>
-                  <label>Tên Xóm Trọ:</label>
-                  <input
+                  <label>Tên Xóm Trọ:</label
+                  ><input
                     type="text"
                     id="prof-name"
                     placeholder="VD: Trọ Sinh Viên Giá Rẻ"
                   />
                 </div>
                 <div>
-                  <label>Số điện thoại liên hệ:</label>
-                  <input
+                  <label>Số điện thoại liên hệ:</label
+                  ><input
                     type="text"
                     id="prof-phone"
                     placeholder="VD: 0912 345 678"
                   />
                 </div>
               </div>
-
-              <label>Địa chỉ cụ thể:</label>
-              <input
+              <label>Địa chỉ cụ thể:</label
+              ><input
                 type="text"
                 id="prof-address"
-                placeholder="VD: Số 10, Ngõ 20, Quận X..."
+                placeholder="VD: Số 10, Ngõ 20..."
               />
-
-              <label>Mô tả tiện ích:</label>
-              <textarea
+              <label>Mô tả tiện ích:</label
+              ><textarea
                 id="prof-desc"
                 rows="3"
                 placeholder="Ghi rõ thông tin để thu hút khách thuê..."
               ></textarea>
-
-              <label style="margin-top: 10px"
-                >Ảnh bìa Xóm Trọ (Hiển thị ngoài trang chủ):</label
-              >
-              <input
+              <label style="margin-top: 10px">Ảnh bìa Xóm Trọ:</label
+              ><input
                 type="file"
                 id="prof-img"
                 accept="image/*"
                 style="border: none; padding: 0"
               />
-
               <button
                 id="btnSaveProfile"
                 class="btn btn-primary"
@@ -342,6 +320,25 @@
         </div>
       </main>
     </div>
+
+    <script>
+      function switchTab(tabId, element) {
+        document
+          .querySelectorAll(".content-section")
+          .forEach((sec) => (sec.style.display = "none"));
+        document
+          .querySelectorAll(".nav-menu li")
+          .forEach((li) => li.classList.remove("active"));
+        document.getElementById(tabId).style.display = "block";
+        element.parentElement.classList.add("active");
+      }
+      function exportTableToExcel(tableID, filename = "") {
+        var tableSelect = document.getElementById(tableID);
+        var wb = XLSX.utils.table_to_book(tableSelect, { sheet: "Sheet 1" });
+        XLSX.writeFile(wb, filename + ".xlsx");
+      }
+    </script>
+
     <script type="module" src="js/admin-motel.js"></script>
   </body>
 </html>

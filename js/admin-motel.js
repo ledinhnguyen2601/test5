@@ -1,4 +1,4 @@
-import { auth, db } from "./js/firebase.js";
+import { auth, db } from "./firebase.js";
 import {
   onAuthStateChanged,
   signOut,
@@ -24,7 +24,8 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) return (window.location.href = "login.html");
   const d = await getDoc(doc(db, "users", user.uid));
   userData = d.data();
-  document.getElementById("admin-name").innerText = userData.name || "Chủ Trọ";
+  document.getElementById("admin-name").innerText =
+    userData.name || "Chủ Trọ Admin";
   loadUtilities();
   loadReports();
   loadRooms();
@@ -33,13 +34,6 @@ onAuthStateChanged(auth, async (user) => {
 document
   .querySelector(".logout-btn")
   .addEventListener("click", () => signOut(auth));
-
-// HÀM XUẤT EXCEL
-window.exportTableToExcel = function (tableID, filename = "") {
-  var tableSelect = document.getElementById(tableID);
-  var wb = XLSX.utils.table_to_book(tableSelect, { sheet: "Sheet 1" });
-  XLSX.writeFile(wb, filename + ".xlsx");
-};
 
 async function loadUtilities() {
   const snap = await getDocs(
@@ -90,6 +84,9 @@ document.getElementById("btnAddRoom").addEventListener("click", async () => {
     tenant: rTenant,
     status: rTenant ? "Đang thuê" : "Phòng trống",
   });
+  document.getElementById("new-room-id").value = "";
+  document.getElementById("new-room-price").value = "";
+  document.getElementById("new-room-tenant").value = "";
   loadRooms();
 });
 
@@ -101,11 +98,9 @@ async function loadRooms() {
   tbody.innerHTML = snap.empty
     ? `<tr><td colspan="5" style="text-align: center;">Chưa có phòng nào.</td></tr>`
     : "";
-
   let totalRev = 0,
     rentedCount = 0,
     emptyCount = 0;
-
   snap.forEach((d) => {
     const item = d.data();
     if (item.status === "Đang thuê") {
@@ -139,7 +134,7 @@ async function loadRooms() {
   revenueChartInstance = new Chart(document.getElementById("revenueChart"), {
     type: "bar",
     data: {
-      labels: ["Doanh thu hiện tại"],
+      labels: ["Doanh thu (VNĐ)"],
       datasets: [
         { label: "VNĐ", data: [totalRev], backgroundColor: "#2563eb" },
       ],
@@ -184,20 +179,18 @@ async function loadReports() {
   );
 }
 
-// --- LƯU THÔNG TIN HỒ SƠ LÊN TRANG CHỦ ---
 document
   .getElementById("btnSaveProfile")
   .addEventListener("click", async (e) => {
-    const pName = document.getElementById("prof-name").value;
-    const pAddress = document.getElementById("prof-address").value;
-    const pPhone = document.getElementById("prof-phone").value;
-    const pDesc = document.getElementById("prof-desc").value;
-    const fileInput = document.getElementById("prof-img");
-    const btn = e.target;
-
+    const pName = document.getElementById("prof-name").value,
+      pAddress = document.getElementById("prof-address").value,
+      pPhone = document.getElementById("prof-phone").value,
+      pDesc = document.getElementById("prof-desc").value,
+      fileInput = document.getElementById("prof-img");
     if (!pName || !pAddress || !pPhone)
-      return alert("Vui lòng nhập Tên, Địa chỉ và Số điện thoại!");
-    btn.innerText = "Đang mã hóa ảnh và lưu lên mây...";
+      return alert("Vui lòng nhập Tên, Địa chỉ, SĐT!");
+    const btn = e.target;
+    btn.innerText = "Đang tải dữ liệu...";
 
     if (fileInput.files.length > 0) {
       const reader = new FileReader();
@@ -236,14 +229,3 @@ document
         '<i class="fas fa-save"></i> Lưu & Công khai lên Trang chủ';
     }
   });
-
-window.switchTab = function (tabId, element) {
-  document
-    .querySelectorAll(".content-section")
-    .forEach((sec) => (sec.style.display = "none"));
-  document
-    .querySelectorAll(".nav-menu li")
-    .forEach((li) => li.classList.remove("active"));
-  document.getElementById(tabId).style.display = "block";
-  element.parentElement.classList.add("active");
-};

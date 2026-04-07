@@ -1,4 +1,4 @@
-import { auth, db } from "./js/firebase.js";
+import { auth, db } from "./firebase.js";
 import {
   onAuthStateChanged,
   signOut,
@@ -26,6 +26,8 @@ onAuthStateChanged(auth, async (user) => {
   userData = d.data();
   document.getElementById("admin-name").innerText =
     userData.name || "BQL Admin";
+  document.getElementById("building-display").innerText =
+    "Hệ thống: " + userData.building;
   loadReports();
   loadResidents();
   loadVehicles();
@@ -35,12 +37,6 @@ onAuthStateChanged(auth, async (user) => {
 document
   .querySelector(".logout-btn")
   .addEventListener("click", () => signOut(auth));
-
-window.exportTableToExcel = function (tableID, filename = "") {
-  var tableSelect = document.getElementById(tableID);
-  var wb = XLSX.utils.table_to_book(tableSelect, { sheet: "Sheet 1" });
-  XLSX.writeFile(wb, filename + ".xlsx");
-};
 
 document
   .getElementById("btnAddResident")
@@ -55,8 +51,12 @@ document
       name,
       phone,
     });
+    document.getElementById("new-res-room").value = "";
+    document.getElementById("new-res-name").value = "";
+    document.getElementById("new-res-phone").value = "";
     loadResidents();
   });
+
 async function loadResidents() {
   const snap = await getDocs(
     query(
@@ -94,8 +94,12 @@ document.getElementById("btnAddVehicle").addEventListener("click", async () => {
     plate,
     type,
   });
+  document.getElementById("new-veh-room").value = "";
+  document.getElementById("new-veh-plate").value = "";
+  document.getElementById("new-veh-type").value = "";
   loadVehicles();
 });
+
 async function loadVehicles() {
   const snap = await getDocs(
     query(
@@ -158,6 +162,7 @@ document.getElementById("btnCreateBill").addEventListener("click", async () => {
   });
   loadBills();
 });
+
 document.getElementById("btnAutoBill").addEventListener("click", async () => {
   const fee = prompt(
     "Nhập Phí quản lý chung cho TẤT CẢ các căn hộ (VNĐ):",
@@ -187,6 +192,7 @@ document.getElementById("btnAutoBill").addEventListener("click", async () => {
   alert(`Đã phát tự động thành công Hóa đơn!`);
   loadBills();
 });
+
 async function loadBills() {
   const snap = await getDocs(
     query(
@@ -196,7 +202,7 @@ async function loadBills() {
   );
   const tbody = document.getElementById("bills-tbody");
   tbody.innerHTML = snap.empty
-    ? `<tr><td colspan="5" style="text-align: center;">Chưa phát hóa đơn.</td></tr>`
+    ? `<tr><td colspan="5" style="text-align: center;">Chưa phát hóa đơn nào.</td></tr>`
     : "";
   let unpaid = 0,
     paid = 0;
@@ -253,20 +259,18 @@ async function loadReports() {
   );
 }
 
-// --- LƯU THÔNG TIN HỒ SƠ LÊN TRANG CHỦ ---
 document
   .getElementById("btnSaveProfile")
   .addEventListener("click", async (e) => {
-    const pName = document.getElementById("prof-name").value;
-    const pAddress = document.getElementById("prof-address").value;
-    const pPhone = document.getElementById("prof-phone").value;
-    const pDesc = document.getElementById("prof-desc").value;
-    const fileInput = document.getElementById("prof-img");
-    const btn = e.target;
-
+    const pName = document.getElementById("prof-name").value,
+      pAddress = document.getElementById("prof-address").value,
+      pPhone = document.getElementById("prof-phone").value,
+      pDesc = document.getElementById("prof-desc").value,
+      fileInput = document.getElementById("prof-img");
     if (!pName || !pAddress || !pPhone)
-      return alert("Vui lòng nhập Tên, Địa chỉ và Số điện thoại!");
-    btn.innerText = "Đang mã hóa ảnh và lưu lên mây...";
+      return alert("Vui lòng nhập Tên, Địa chỉ và SĐT!");
+    const btn = e.target;
+    btn.innerText = "Đang tải dữ liệu...";
 
     if (fileInput.files.length > 0) {
       const reader = new FileReader();
@@ -305,14 +309,3 @@ document
         '<i class="fas fa-save"></i> Lưu & Công khai lên Trang chủ';
     }
   });
-
-window.switchTab = function (tabId, element) {
-  document
-    .querySelectorAll(".content-section")
-    .forEach((sec) => (sec.style.display = "none"));
-  document
-    .querySelectorAll(".nav-menu li")
-    .forEach((li) => li.classList.remove("active"));
-  document.getElementById(tabId).style.display = "block";
-  element.parentElement.classList.add("active");
-};
